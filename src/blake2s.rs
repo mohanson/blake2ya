@@ -120,26 +120,29 @@ pub struct Blake2s {
 impl Blake2s {
     /// Update this hash object's state with the provided data.
     pub fn update(&mut self, data: &[u8]) {
-        let mut data = data;
+        let mut dlen = data.len();
+        if dlen <= BLAKE2S_BB - self.l {
+            self.b[self.l..self.l + dlen].copy_from_slice(data);
+            self.l += dlen;
+            return;
+        }
+        let mut doff = 0;
         if self.l != 0 {
-            if data.len() <= BLAKE2S_BB - self.l {
-                self.b[self.l..].copy_from_slice(data);
-                self.l += data.len();
-                return;
-            }
             self.b[self.l..].copy_from_slice(&data[..BLAKE2S_BB - self.l]);
             incoff(&mut self.t, BLAKE2S_BB as u32);
             reduce(&mut self.h, unsafe { self.b.align_to::<u32>().1.try_into().unwrap() }, &self.t, &self.f);
-            data = &data[BLAKE2S_BB - self.l..];
+            doff += BLAKE2S_BB - self.l;
+            dlen -= BLAKE2S_BB - self.l;
         }
-        for _ in 0..data.len() / BLAKE2S_BB {
-            self.b.copy_from_slice(&data[..BLAKE2S_BB]);
+        for _ in 0..(dlen - 1) / BLAKE2S_BB {
+            self.b.copy_from_slice(&data[doff..doff + BLAKE2S_BB]);
             incoff(&mut self.t, BLAKE2S_BB as u32);
             reduce(&mut self.h, unsafe { self.b.align_to::<u32>().1.try_into().unwrap() }, &self.t, &self.f);
-            data = &data[BLAKE2S_BB..];
+            doff += BLAKE2S_BB;
+            dlen -= BLAKE2S_BB;
         }
-        self.l = data.len();
-        self.b[..self.l].copy_from_slice(data);
+        self.b[..dlen].copy_from_slice(&data[doff..]);
+        self.l = dlen;
     }
 
     /// Return the digest value.
