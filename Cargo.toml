@@ -1,6 +1,6 @@
 [package]
-name = "blake2"
-version = "1.0.0"
+name = "blake2ya"
+version = "0.9.0"
 edition = "2021"
 description = "The BLAKE2 cryptographic hash and message authentication code"
 license = "MIT"
