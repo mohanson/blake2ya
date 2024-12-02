@@ -170,7 +170,7 @@ pub fn blake2b_params() -> Param2b {
     r
 }
 
-// Core hasher state of BLAKE2b.
+/// Core hasher state of BLAKE2b.
 pub fn blake2b(param2b: Param2b) -> Blake2b {
     let mut r = Blake2b { h: [0; 8], t: [0; 2], f: [0; 2], b: [0; 128], l: 0 };
     for i in 0..8 {
