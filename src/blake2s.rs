@@ -115,6 +115,8 @@ pub struct Blake2s {
     b: [u8; BLAKE2S_BB],
     /// Buffer length.
     l: usize,
+    /// Parameter block.
+    p: Param2s,
 }
 
 impl Blake2s {
@@ -146,12 +148,13 @@ impl Blake2s {
     }
 
     /// Return the digest value.
-    pub fn digest(&mut self) -> [u8; 32] {
+    pub fn digest(&mut self, d: &mut [u8]) {
         self.b[self.l..].fill(0);
         self.f[0] = u32::MAX;
         incoff(&mut self.t, self.l as u32);
         reduce(&mut self.h, unsafe { self.b.align_to::<u32>().1.try_into().unwrap() }, &self.t, &self.f);
-        unsafe { self.h.align_to::<u8>() }.1.try_into().unwrap()
+        let result: [u8; 32] = unsafe { self.h.align_to::<u8>() }.1.try_into().unwrap();
+        d.copy_from_slice(&result[..self.p.buf[0] as usize]);
     }
 }
 
@@ -165,12 +168,12 @@ pub fn blake2s_params() -> Param2s {
 
 /// Core hasher state of BLAKE2s.
 pub fn blake2s(param2s: Param2s) -> Blake2s {
-    let mut r = Blake2s { h: [0; 8], t: [0; 2], f: [0; 2], b: [0; 64], l: 0 };
+    let mut r = Blake2s { h: [0; 8], t: [0; 2], f: [0; 2], b: [0; 64], l: 0, p: param2s };
     for i in 0..8 {
-        r.h[i] = BLAKE2S_IV[i] ^ u32::from_le_bytes(param2s.buf[i * 4..i * 4 + 4].try_into().unwrap())
+        r.h[i] = BLAKE2S_IV[i] ^ u32::from_le_bytes(r.p.buf[i * 4..i * 4 + 4].try_into().unwrap())
     }
-    if param2s.buf[1] != 0 {
-        r.b[..32].copy_from_slice(&param2s.key);
+    if r.p.buf[1] != 0 {
+        r.b[..32].copy_from_slice(&r.p.key);
         incoff(&mut r.t, BLAKE2S_BB as u32);
         reduce(&mut r.h, unsafe { r.b.align_to::<u32>().1.try_into().unwrap() }, &r.t, &r.f);
     }
