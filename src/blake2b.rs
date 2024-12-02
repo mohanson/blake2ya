@@ -29,12 +29,45 @@ const BLAKE2B_IV: [u64; 8] = [
 
 /// Block bytes.
 const BLAKE2B_BB: usize = 128;
+/// Hash bytes.
+const BLAKE2B_NN: usize = 64;
 
 /// G rotation constants.
 const BLAKE2B_R1: u32 = 32;
 const BLAKE2B_R2: u32 = 24;
 const BLAKE2B_R3: u32 = 16;
 const BLAKE2B_R4: u32 = 63;
+
+/// Interpretation of bytes as words.
+fn interp_hb2w(b: &[u8; BLAKE2B_NN]) -> [u64; BLAKE2B_NN / 8] {
+    let mut w = [0; BLAKE2B_NN / 8];
+    let mut u = [0; 8];
+    for i in 0..w.len() {
+        u.copy_from_slice(&b[i * 8..i * 8 + 8]);
+        w[i] = u64::from_le_bytes(u)
+    }
+    w
+}
+
+/// Interpretation of words as bytes.
+fn interp_hw2b(w: &[u64; BLAKE2B_NN / 8]) -> [u8; BLAKE2B_NN] {
+    let mut b = [0; BLAKE2B_NN];
+    for i in 0..w.len() {
+        b[i * 8..i * 8 + 8].copy_from_slice(&w[i].to_le_bytes());
+    }
+    b
+}
+
+/// Interpretation of bytes as words.
+fn interp_bb2w(b: &[u8; BLAKE2B_BB]) -> [u64; BLAKE2B_BB / 8] {
+    let mut w = [0; BLAKE2B_BB / 8];
+    let mut u = [0; 8];
+    for i in 0..w.len() {
+        u.copy_from_slice(&b[i * 8..i * 8 + 8]);
+        w[i] = u64::from_le_bytes(u)
+    }
+    w
+}
 
 /// The G primitive function mixes two input words, "x" and "y", into four words indexed by "a", "b", "c", and "d" in
 /// the working vector v[0..15].
@@ -142,14 +175,14 @@ impl Blake2b {
         if self.l != 0 {
             self.b[self.l..].copy_from_slice(&data[..BLAKE2B_BB - self.l]);
             incoff(&mut self.t, BLAKE2B_BB as u64);
-            reduce(&mut self.h, unsafe { self.b.align_to::<u64>().1.try_into().unwrap() }, &self.t, &self.f);
+            reduce(&mut self.h, &interp_bb2w(&self.b), &self.t, &self.f);
             doff += BLAKE2B_BB - self.l;
             dlen -= BLAKE2B_BB - self.l;
         }
         for _ in 0..(dlen - 1) / BLAKE2B_BB {
             self.b.copy_from_slice(&data[doff..doff + BLAKE2B_BB]);
             incoff(&mut self.t, BLAKE2B_BB as u64);
-            reduce(&mut self.h, unsafe { self.b.align_to::<u64>().1.try_into().unwrap() }, &self.t, &self.f);
+            reduce(&mut self.h, &interp_bb2w(&self.b), &self.t, &self.f);
             doff += BLAKE2B_BB;
             dlen -= BLAKE2B_BB;
         }
@@ -162,9 +195,9 @@ impl Blake2b {
         self.b[self.l..].fill(0);
         self.f[0] = u64::MAX;
         incoff(&mut self.t, self.l as u64);
-        reduce(&mut self.h, unsafe { self.b.align_to::<u64>().1.try_into().unwrap() }, &self.t, &self.f);
-        let result: [u8; 64] = unsafe { self.h.align_to::<u8>() }.1.try_into().unwrap();
-        d.copy_from_slice(&result[..self.p.buf[0] as usize]);
+        reduce(&mut self.h, &interp_bb2w(&self.b), &self.t, &self.f);
+        let br = interp_hw2b(&self.h);
+        d.copy_from_slice(&br[..self.p.buf[0] as usize]);
     }
 }
 
@@ -179,13 +212,14 @@ pub fn blake2b_params() -> Param2b {
 /// Core hasher state of BLAKE2b.
 pub fn blake2b(param2b: Param2b) -> Blake2b {
     let mut r = Blake2b { h: [0; 8], t: [0; 2], f: [0; 2], b: [0; 128], l: 0, p: param2b };
+    let w = interp_hb2w(&r.p.buf);
     for i in 0..8 {
-        r.h[i] ^= BLAKE2B_IV[i] ^ u64::from_le_bytes(r.p.buf[i * 8..i * 8 + 8].try_into().unwrap())
+        r.h[i] ^= BLAKE2B_IV[i] ^ w[i]
     }
     if r.p.buf[1] != 0 {
-        r.b[..64].copy_from_slice(&r.p.key);
-        incoff(&mut r.t, BLAKE2B_BB as u64);
-        reduce(&mut r.h, unsafe { r.b.align_to::<u64>().1.try_into().unwrap() }, &r.t, &r.f);
+        let mut b = [0; BLAKE2B_BB];
+        b[..r.p.key.len()].copy_from_slice(&r.p.key);
+        r.update(&b);
     }
     r
 }
