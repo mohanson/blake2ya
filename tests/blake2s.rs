@@ -1,8 +1,8 @@
 #[test]
 fn blake2s_empty() {
-    let mut p = blake2::blake2s_params();
+    let mut p = blake2ya::blake2s_params();
     p.digest(32);
-    let mut h = blake2::blake2s(p);
+    let mut h = blake2ya::blake2s(p);
     let r = h.digest();
     let e = [
         0x69, 0x21, 0x7a, 0x30, 0x79, 0x90, 0x80, 0x94, 0xe1, 0x11, 0x21, 0xd0, 0x42, 0x35, 0x4a, 0x7c, 0x1f, 0x55,
@@ -13,9 +13,9 @@ fn blake2s_empty() {
 
 #[test]
 fn blake2s_abc() {
-    let mut p = blake2::blake2s_params();
+    let mut p = blake2ya::blake2s_params();
     p.digest(32);
-    let mut h = blake2::blake2s(p);
+    let mut h = blake2ya::blake2s(p);
     h.update(b"abc");
     let r = h.digest();
     let e = [
@@ -27,9 +27,9 @@ fn blake2s_abc() {
 
 #[test]
 fn blake2s_update() {
-    let mut p = blake2::blake2s_params();
+    let mut p = blake2ya::blake2s_params();
     p.digest(32);
-    let mut h = blake2::blake2s(p);
+    let mut h = blake2ya::blake2s(p);
     for _ in 0..128 {
         h.update(&[0; 64])
     }
@@ -44,9 +44,9 @@ fn blake2s_update() {
 
 #[test]
 fn blake2s_big() {
-    let mut p = blake2::blake2s_params();
+    let mut p = blake2ya::blake2s_params();
     p.digest(32);
-    let mut h = blake2::blake2s(p);
+    let mut h = blake2ya::blake2s(p);
     h.update(&[0; 8224]);
     let r = h.digest();
     let e = [
@@ -58,9 +58,9 @@ fn blake2s_big() {
 
 #[test]
 fn blake2s_digest_16() {
-    let mut p = blake2::blake2s_params();
+    let mut p = blake2ya::blake2s_params();
     p.digest(16);
-    let mut h = blake2::blake2s(p);
+    let mut h = blake2ya::blake2s(p);
     let r = &h.digest()[..16];
     let e = [0x64, 0x55, 0x0d, 0x6f, 0xfe, 0x2c, 0x0a, 0x01, 0xa1, 0x4a, 0xba, 0x1e, 0xad, 0xe0, 0x20, 0x0c];
     assert_eq!(r, e);
@@ -68,13 +68,13 @@ fn blake2s_digest_16() {
 
 #[test]
 fn blake2s_key() {
-    let mut p = blake2::blake2s_params();
+    let mut p = blake2ya::blake2s_params();
     p.digest(32);
     p.key(&[
         0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11,
         0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
     ]);
-    let mut h = blake2::blake2s(p);
+    let mut h = blake2ya::blake2s(p);
     h.update(&[
         0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11,
         0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, 0x20, 0x21, 0x22, 0x23,
@@ -102,10 +102,10 @@ fn blake2s_key() {
 
 #[test]
 fn blake2s_salt() {
-    let mut p = blake2::blake2s_params();
+    let mut p = blake2ya::blake2s_params();
     p.digest(32);
     p.salt(&[0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]);
-    let mut h = blake2::blake2s(p);
+    let mut h = blake2ya::blake2s(p);
     h.update(b"abc");
     let r = h.digest();
     let e = [
@@ -117,10 +117,10 @@ fn blake2s_salt() {
 
 #[test]
 fn blake2s_person() {
-    let mut p = blake2::blake2s_params();
+    let mut p = blake2ya::blake2s_params();
     p.digest(32);
     p.person(&[0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07]);
-    let mut h = blake2::blake2s(p);
+    let mut h = blake2ya::blake2s(p);
     h.update(b"abc");
     let r = h.digest();
     let e = [
