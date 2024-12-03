@@ -1,7 +1,6 @@
 #![no_std]
 
-//! The [BLAKE2](https://www.rfc-editor.org/rfc/rfc7693.html) cryptographic hash and message authentication code. It is
-//! designed to be used on `no_std` systems, and does not contain any unsafe code.
+//! The [BLAKE2](https://www.rfc-editor.org/rfc/rfc7693.html) cryptographic hash and message authentication code.
 //!
 //! **BLAKE2b**
 //!
