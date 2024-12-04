@@ -1,6 +1,6 @@
 # Blake2 Yet Another
 
-The [BLAKE2](https://www.rfc-editor.org/rfc/rfc7693.html) cryptographic hash and message authentication code.
+The [BLAKE2](https://www.rfc-editor.org/rfc/rfc7693.html) cryptographic hash and message authentication code. It is implemented in pure rust, achieves the best performance without using unsafe code, and supports no_std systems.
 
 ```toml
 [dependencies]
@@ -45,9 +45,8 @@ assert_eq!(r, e);
 
 ## Fuzz and bench
 
-21% faster than [blake2b_rs](https://github.com/nervosnetwork/blake2b-rs). See <https://github.com/mohanson/blake2ya-native>.
-
-17% faster than [blake2b_ref](https://github.com/jjyr/blake2b-ref.rs). See <https://github.com/mohanson/blake2ya-script>.
+- <https://github.com/mohanson/blake2ya-native>. 21% faster than blake2b_rs.
+- <https://github.com/mohanson/blake2ya-script>. 17% faster than blake2b_ref.
 
 ## License
 

@@ -1,6 +1,7 @@
 #![no_std]
 
-//! The [BLAKE2](https://www.rfc-editor.org/rfc/rfc7693.html) cryptographic hash and message authentication code.
+//! The [BLAKE2](https://www.rfc-editor.org/rfc/rfc7693.html) cryptographic hash and message authentication code. It is
+//! implemented in pure rust, achieves the best performance without using unsafe code, and supports no_std systems.
 //!
 //! **BLAKE2b**
 //!
