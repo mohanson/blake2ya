@@ -43,6 +43,12 @@ let e = [
 assert_eq!(r, e);
 ```
 
+## Fuzz and bench
+
+21% faster than [blake2b_rs](https://github.com/nervosnetwork/blake2b-rs). See <https://github.com/mohanson/blake2ya-native>.
+
+17% faster than [blake2b_ref](https://github.com/jjyr/blake2b-ref.rs). See <https://github.com/mohanson/blake2ya-script>.
+
 ## License
 
 MIT.
