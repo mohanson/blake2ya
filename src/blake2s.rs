@@ -282,9 +282,17 @@ pub fn blake2s_params() -> Param2s {
 pub fn blake2s(param2s: Param2s) -> Blake2s {
     let mut r = Blake2s { h: [0; 8], t: [0; 2], f: [0; 2], b: [0; 64], l: 0, p: param2s };
     let w = interp_hb2w(&r.p.buf);
-    for i in 0..8 {
-        r.h[i] ^= BLAKE2S_IV[i] ^ w[i]
-    }
+
+    // Improve performance by using loop unrolling.
+    r.h[0x0] ^= BLAKE2S_IV[0x0] ^ w[0x0];
+    r.h[0x1] ^= BLAKE2S_IV[0x1] ^ w[0x1];
+    r.h[0x2] ^= BLAKE2S_IV[0x2] ^ w[0x2];
+    r.h[0x3] ^= BLAKE2S_IV[0x3] ^ w[0x3];
+    r.h[0x4] ^= BLAKE2S_IV[0x4] ^ w[0x4];
+    r.h[0x5] ^= BLAKE2S_IV[0x5] ^ w[0x5];
+    r.h[0x6] ^= BLAKE2S_IV[0x6] ^ w[0x6];
+    r.h[0x7] ^= BLAKE2S_IV[0x7] ^ w[0x7];
+
     if r.p.buf[1] != 0 {
         let mut b = [0; BLAKE2S_BB];
         b[..r.p.key.len()].copy_from_slice(&r.p.key);
