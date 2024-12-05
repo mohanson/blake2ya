@@ -46,7 +46,7 @@ assert_eq!(r, e);
 ## Fuzz and bench
 
 - <https://github.com/mohanson/blake2ya-native>. 21% faster than blake2b_rs.
-- <https://github.com/mohanson/blake2ya-script>. 17% faster than blake2b_ref.
+- <https://github.com/mohanson/blake2ya-script>. 23% faster than blake2b_ref.
 
 ## License
 
