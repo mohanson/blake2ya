@@ -227,17 +227,19 @@ impl Param2b {
     pub fn key(&mut self, n: &[u8]) {
         assert!(n.len() <= 64);
         self.buf[0x01] = n.len() as u8;
-        self.key.copy_from_slice(n);
+        self.key[..n.len()].copy_from_slice(n);
     }
 
     /// Set salt. An arbitrary string of 16 bytes for BLAKE2b, and 8 bytes for BLAKE2s.
-    pub fn salt(&mut self, n: &[u8; 16]) {
-        self.buf[0x20..0x30].copy_from_slice(n);
+    pub fn salt(&mut self, n: &[u8]) {
+        assert!(n.len() <= 16);
+        self.buf[0x20..0x20 + n.len()].copy_from_slice(n);
     }
 
     /// Set personalization. An arbitrary string of 16 bytes for BLAKE2b, and 8 bytes for BLAKE2s.
-    pub fn person(&mut self, n: &[u8; 16]) {
-        self.buf[0x30..0x40].copy_from_slice(n);
+    pub fn person(&mut self, n: &[u8]) {
+        assert!(n.len() <= 16);
+        self.buf[0x30..0x30 + n.len()].copy_from_slice(n);
     }
 }
 
