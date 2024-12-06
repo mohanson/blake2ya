@@ -191,7 +191,7 @@ pub struct Param2s {
 }
 
 impl Param2s {
-    /// Set digest byte length (1byte): an integer in [1, 64] for BLAKE2b, in [1, 32] for BLAKE2s.
+    /// Set digest byte length. An integer in [1, 64] for BLAKE2b, in [1, 32] for BLAKE2s.
     pub fn digest(&mut self, n: u8) {
         assert!(1 <= n && n <= 32);
         self.buf[0x00] = n;
@@ -204,7 +204,7 @@ impl Param2s {
         self.key[..n.len()].copy_from_slice(n);
     }
 
-    /// Salt is an arbitrary string of 16 bytes for BLAKE2b, and 8 bytes for BLAKE2s.
+    /// Set salt. An arbitrary string of 16 bytes for BLAKE2b, and 8 bytes for BLAKE2s.
     pub fn salt(&mut self, n: &[u8]) {
         assert!(n.len() <= 8);
         self.buf[0x10..0x10 + n.len()].copy_from_slice(n);

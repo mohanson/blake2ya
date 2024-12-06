@@ -217,7 +217,7 @@ pub struct Param2b {
 }
 
 impl Param2b {
-    /// Set digest byte length (1byte): an integer in [1, 64] for BLAKE2b, in [1, 32] for BLAKE2s.
+    /// Set digest byte length. An integer in [1, 64] for BLAKE2b, in [1, 32] for BLAKE2s.
     pub fn digest(&mut self, n: u8) {
         assert!(1 <= n && n <= 64);
         self.buf[0x00] = n;
