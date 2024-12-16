@@ -4,8 +4,10 @@ The [BLAKE2](https://www.rfc-editor.org/rfc/rfc7693.html) cryptographic hash and
 
 ```toml
 [dependencies]
-blake2ya = "0.9"
+blake2ya = "1.0"
 ```
+
+Note that version 1.0 removes the loop unrolling optimization, so the performance will be significantly reduced compared to version 0.9.
 
 ## Example
 
