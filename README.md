@@ -45,6 +45,10 @@ let e = [
 assert_eq!(r, e);
 ```
 
+## Performance and fuzz testing
+
+- <https://github.com/mohanson/blake2ya-native>
+
 ## License
 
 MIT
