@@ -220,6 +220,7 @@ fn incoff(t: &mut [u64; 2], n: u64) {
 }
 
 /// BLAKE2b parameter block structure.
+#[derive(Clone)]
 pub struct Param2b {
     buf: [u8; 64],
     key: [u8; 64],
