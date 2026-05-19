@@ -176,9 +176,9 @@ impl Blake2s {
             dlen -= BLAKE2S_BB - self.l;
         }
         for _ in 0..(dlen - 1) / BLAKE2S_BB {
-            self.b.copy_from_slice(&data[doff..doff + BLAKE2S_BB]);
+            let buffer: [u8; BLAKE2S_BB] = data[doff..doff + BLAKE2S_BB].try_into().unwrap();
             incoff(&mut self.t, BLAKE2S_BB as u32);
-            reduce(&mut self.h, &interp_bb2w(&self.b), &self.t, &self.f);
+            reduce(&mut self.h, &interp_bb2w(&buffer), &self.t, &self.f);
             doff += BLAKE2S_BB;
             dlen -= BLAKE2S_BB;
         }
