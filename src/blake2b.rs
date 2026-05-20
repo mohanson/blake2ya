@@ -185,8 +185,10 @@ impl Blake2b {
             doff += BLAKE2B_BB - self.l;
             dlen -= BLAKE2B_BB - self.l;
         }
+        // Process full blocks. Creating a new buffer offers better performance than using self.b.
+        let mut buffer: [u8; BLAKE2B_BB] = [0; BLAKE2B_BB];
         for _ in 0..(dlen - 1) / BLAKE2B_BB {
-            let buffer: [u8; BLAKE2B_BB] = data[doff..doff + BLAKE2B_BB].try_into().unwrap();
+            buffer.copy_from_slice(&data[doff..doff + BLAKE2B_BB]);
             incoff(&mut self.t, BLAKE2B_BB as u64);
             reduce(&mut self.h, &interp_bb2w(&buffer), &self.t, &self.f);
             doff += BLAKE2B_BB;
